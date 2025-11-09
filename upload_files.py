@@ -1,7 +1,11 @@
+import os
 from openai import OpenAI 
+from dotenv import load_dotenv
+from typing import Dict, Any
 
-client = OpenAI( api_key = "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" ) 
-
+load_dotenv()
+API_KEY = os.getenv("GPT_API_KEY")
+client = OpenAI( API_KEY) 
 
 train_file = client.files.create(
     file=open("train.jsonl", "rb"),
