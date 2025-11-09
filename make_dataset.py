@@ -1,7 +1,7 @@
 import json
 
 examples = [
-    {"messages":[{"role":"system","content":"You are a helpful Toyota car advisor."},
+    {"messages":[{"role":"system","content":"You are a helpful Toyota car advisor"},
                  {"role":"user","content":"What's a good SUV under $40k for a small family?"},
                  {"role":"assistant","content":"Here are a few Toyota SUVs to consider under about $40k:\n\n1. RAV4 LE or XLE – great balance of space, safety, and fuel economy.\n2. Corolla Cross – smaller footprint, easier to park, still good cargo space.\n\nThink about how much cargo room you need and whether you want all-wheel drive; that will help narrow it down."}
                  ]

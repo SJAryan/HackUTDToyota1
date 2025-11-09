@@ -1,7 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
     const userInput = document.getElementById('userInput');
     const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
     const outputBox = document.getElementById('outputBox');
+
+    let vehicleModels = [];
+    let allVehicleModels = [];
+
+    // Load and display all models on page load
+    fetch('data/vehicle_listings.json')
+        .then(res => res.json())
+        .then(data => {
+            vehicleModels = data.slice();
+            allVehicleModels = data.slice();
+            renderModelList();
+        });
+
+    function renderModelList() {
+        outputBox.innerHTML = '';
+        vehicleModels.forEach((model) => {
+            const modelDiv = document.createElement('div');
+            modelDiv.classList.add('model-listing');
+
+            const link = document.createElement('a');
+            link.href = model.url;
+            link.textContent = model.model_name;
+            link.target = '_blank';
+            link.classList.add('model-link');
+
+            modelDiv.appendChild(link);
+            outputBox.appendChild(modelDiv);
+        });
+    }
 
     submitBtn.addEventListener('click', handleSubmit);
     userInput.addEventListener('keypress', (e) => {
@@ -10,34 +40,35 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // FIX 1: Make handleSubmit async
+    resetBtn.addEventListener('click', () => {
+        vehicleModels = allVehicleModels.slice();
+        renderModelList();
+    });
+
     async function handleSubmit() {
         const query = userInput.value.trim();
         if (!query) return;
 
-        // Clear the input
         userInput.value = '';
 
-        // Add user query to output box
         const userMessage = document.createElement('div');
         userMessage.classList.add('message', 'user-message');
         userMessage.textContent = query;
-        outputBox.appendChild(userMessage);
 
-        // FIX 2: Await the response and pass the 'query' string
         const aiResponseText = await sendToPython(query);
-        
-        // FIX 3: Add the AI response to the output box
-        const aiMessage = document.createElement('div');
-        aiMessage.classList.add('message', 'ai-message');
-        aiMessage.textContent = aiResponseText;
-        outputBox.appendChild(aiMessage);
+
+        var newModels = [];
+        for (const modelName of aiResponseText.split(',').map(name => name.trim())) {
+            const matchedModel = vehicleModels.find(m => m.model_name.toLowerCase() === modelName.toLowerCase());
+            if (matchedModel) {
+                newModels.push(matchedModel);
+            }
+        }
+        vehicleModels = newModels;
+        renderModelList();
     }
 
     async function sendToPython(textToSend) {
-        // FIX 4: Remove the hardcoded text
-        // textToSend = "hello from javascript"; 
-
         const response = await fetch("http://127.0.0.1:5000/process", {
             method: "POST",
             headers: {
