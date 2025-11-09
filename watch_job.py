@@ -5,10 +5,10 @@ from dotenv import load_dotenv
 from typing import Dict, Any
 
 load_dotenv()
-API_KEY = os.getenv("GPT_API_KEY")
-client = OpenAI( API_KEY) 
 
-JOB_ID = "ftjob-e34ENUOdHlCQC8tCgMpCW50X" 
+client = OpenAI()
+
+JOB_ID = "ftjob-BiGTKpDyLLUphQ7cwsNhZhV6" 
 
 while True:
     job = client.fine_tuning.jobs.retrieve(JOB_ID)

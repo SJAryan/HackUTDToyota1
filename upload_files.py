@@ -4,8 +4,8 @@ from dotenv import load_dotenv
 from typing import Dict, Any
 
 load_dotenv()
-API_KEY = os.getenv("GPT_API_KEY")
-client = OpenAI( API_KEY) 
+
+client = OpenAI()
 
 train_file = client.files.create(
     file=open("train.jsonl", "rb"),

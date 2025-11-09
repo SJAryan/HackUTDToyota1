@@ -4,11 +4,11 @@ from dotenv import load_dotenv
 from typing import Dict, Any
 
 load_dotenv()
-API_KEY = os.getenv("GPT_API_KEY")
-client = OpenAI( API_KEY) 
+
+client = OpenAI()
 
 
-TRAIN_FILE_ID = "file-ENdiPLB7DQoFhmtUu382ba"
+TRAIN_FILE_ID = "file-LvUwxXdMFUfTzYGSa8BvaZ"
 
 
 
