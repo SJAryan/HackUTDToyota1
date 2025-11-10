@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderModelList();
     });
 
-    async function handleSubmit() {
+ async function handleSubmit() {
         const query = userInput.value.trim();
         if (!query) return;
 
@@ -55,9 +55,20 @@ document.addEventListener('DOMContentLoaded', () => {
         userMessage.classList.add('message', 'user-message');
         userMessage.textContent = query;
 
+        // This function will now return `null` if there's an error
         const aiResponseText = await sendToPython(query);
 
+        // *** ADD THIS CHECK ***
+        // If the server failed, aiResponseText will be null.
+        // Stop the function from running and crashing on .split().
+        if (!aiResponseText) {
+            console.error("Failed to get a valid response from the server.");
+            // You could also show a message to the user here
+            return; 
+        }
+
         var newModels = [];
+        // This line is now safe
         for (const modelName of aiResponseText.split(',').map(name => name.trim())) {
             const matchedModel = vehicleModels.find(m => m.model_name.toLowerCase() === modelName.toLowerCase());
             if (matchedModel) {
@@ -69,15 +80,37 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function sendToPython(textToSend) {
-        const response = await fetch("http://127.0.0.1:5000/process", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ text: textToSend }),
-        });
+        try { // Add a try...catch block for network errors
+            const response = await fetch("http://127.0.0.1:5000/process", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ text: textToSend }),
+            });
 
-        const data = await response.json();
-        return data.processed;
+            // *** ADD THIS CHECK ***
+            // Check if the response status is OK (e.g., 200)
+            if (!response.ok) {
+                // Log the server error to the console for debugging
+                console.error("Server error:", response.status, response.statusText);
+                return null; // Return null to signal an error
+            }
+
+            const data = await response.json();
+            
+            // Also check if the 'processed' key exists
+            if (data && data.processed) {
+                 return data.processed;
+            } else {
+                console.error("Invalid response from server:", data);
+                return null; // Return null if data is not in the expected format
+            }
+
+        } catch (error) {
+            // This catches network failures or if response.json() fails
+            console.error("Fetch error:", error);
+            return null; // Return null to signal an error
+        }
     }
 });
